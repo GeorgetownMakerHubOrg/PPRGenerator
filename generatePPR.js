@@ -193,7 +193,7 @@ function writeToPPR(itemsArray, addtlFields){
   }
   console.log("fields");
   console.log(JSON.stringify(fields, null, "  "));
-  filename = fields["Name of Vendor 1"].replace(/[^0-9a-zA-Z]/g,"") + "_"+ moment().format('YYYY_MM_DD')+"_CoroonPPR.pdf";
+  filename = moment().format('YYYY.MM.DD') + " - Coroon - " + fields["Name of Vendor 1"].replace(/[^ 0-9a-zA-Z]/g,"") + " - "+ fields["Business Purpose"].replace(/[^ 0-9a-zA-Z]/g,"")+".pdf";
   doWrite(fields,filename);
 
 
