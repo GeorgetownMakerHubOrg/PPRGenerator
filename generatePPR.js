@@ -15,8 +15,8 @@ const SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly'];
 // time.
 const TOKEN_PATH = 'token.json';
 
-var orderSheetId = '1MznAbKY0VS9M4S1rhw_RJUoZ85AhWTJ1BtzU3BptTfg';
-
+//var orderSheetId = '1MznAbKY0VS9M4S1rhw_RJUoZ85AhWTJ1BtzU3BptTfg';
+var orderSheetId = '1_AtNK9XKil42hGTc4bwOQWPhzCBfzeedn2uxZ5EIob8'; // 2020 sheet
 
 // print process.argv
 process.argv.forEach(function (val, index, array) {
@@ -26,14 +26,20 @@ process.argv.forEach(function (val, index, array) {
 var startRow = process.argv[2];
 var endRow = process.argv[3];
 
-// Load client secrets from a local file.
-fs.readFile('credentials.json', (err, content) => {
-  if (err) return console.log('Error loading client secret file:', err);
-  // Authorize a client with credentials, then call the Google Sheets API.
-  authorize(JSON.parse(content), function(auth){
-    listOrderItems(auth, startRow, endRow, writeToPPR)});
-});
+if(startRow == "list"){
+  listPDFFields();
+}else if(!startRow || !endRow){
+  throw new Error("You need to specify the start and end row numbers from the spreadsheet");
+}else{
 
+  // Load client secrets from a local file.
+  fs.readFile('credentials.json', (err, content) => {
+    if (err) return console.log('Error loading client secret file:', err);
+    // Authorize a client with credentials, then call the Google Sheets API.
+    authorize(JSON.parse(content), function(auth){
+    listOrderItems(auth, startRow, endRow, writeToPPR)});
+  });
+}
 /**
  * Create an OAuth2 client with the given credentials, and then execute the
  * given callback function.
@@ -165,8 +171,9 @@ function writeToPPR(itemsArray, addtlFields){
       vendor = item["Vendor"].trim();
     }
   }
-  fields["TotalTOTAL"] = grandTotal;
+  fields["TotalTOTAL"] = Math.round(grandTotal * 100) / 100;
   fields["Name of Vendor 1"] = "";
+  fields["Date"] = moment().format('MM/DD/YYYY');
   if(vendor){
     var vendorFields = vendor.split(",");
     fields["Name of Vendor 1"] = vendorFields[0];
@@ -178,6 +185,9 @@ function writeToPPR(itemsArray, addtlFields){
     }
     if(vendorFields[3]){
       fields["Vendor's Contact"] = vendorFields[3];
+    }
+    if(vendorFields[4]){
+      fields["Business Purpose"] = vendorFields[4];
     }
 
   }
@@ -200,6 +210,18 @@ function doWrite(fields, filename){
           console.log("The file was saved!");
       }); 
   }, function(err) {
+      console.log(err);
+  });
+}
+
+
+function listPDFFields(callback){
+
+  pdfFillForm.read(sourcePDF)
+    .then(function(result) {
+      console.log ("listPDFFields");
+      console.log(result);
+    }, function(err) {
       console.log(err);
   });
 }
