@@ -106,7 +106,7 @@ function listOrderItems(auth, startRow, endRow, callback) {
     if (rows.length) {
       console.log(rows.length);
       console.log(startRow + " : " + endRow);
-      rows = rows.slice(startRow - 2, endRow);
+      rows = rows.slice(startRow - 2, endRow -1);
       // Print columns A and E, which correspond to indices 0 and 4.
       var itemsArray = rows.map((row) => {
         console.log(row);
